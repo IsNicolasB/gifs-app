@@ -1,3 +1,37 @@
-<section class="py-5">
+<!-- <section class="py-5">
     <gif-list [gifs] = "gifService.trendingGifs()"></gif-list>
-</section>
+</section> -->
+
+
+<!-- Diseño 1 - Lo ordena el navegador (sin control)-->
+<!-- <div class="columns-2 md:columns-4 gap-4 pt-4">
+    @for (gif of gifService.trendingGifs(); track gif.id) {
+    <div class="mb-4 break-inside-avoid">
+        <img class="w-full rounded-lg object-cover" src="{{gif.url}}" alt="{{gif.title}}">
+    </div>
+    }
+</div> -->
+
+<!-- Diseño 2 - Lo ordenamos nosotros (más control)
+    Se completa una columna antes de pasar a la siguiente
+    por lo tanto, para que se vea bien la cantidad de gifs debe ser
+    n múltiplo de la cantidad de columnas y filas
+
+    Lo recomendado en este caso es que cada grupo tenga 4 elementos
+    para que sea multiplo de 2 y 4 (division de columnas segun tamaño de pantalla)
+
+    En este caso son grupos de 3 a modo de prueba
+-->
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4">
+    @for (group of gifService.trendingGifGroup(); track $index) {
+    <div class="grid gap-4">
+        @for (gif of group; track gif.id) {
+        <div>
+            <img class="h-full w-full rounded-lg object-cover"
+                [src]="gif.url" alt="{{gif.title}}">
+        </div>
+        }
+    </div>
+    }
+</div>

@@ -19,6 +19,15 @@ export class GifsService {
     trendingGifs = signal<Gif[]>([])
     trendingGifsLoad = signal<boolean>(true)
  
+    trendingGifGroup = computed<Gif[][]>(()=> {
+        const groups : Gif[][] = []
+        for( let i = 0; i < this.trendingGifs().length; i += 3){
+            groups.push( this.trendingGifs().slice(i, i + 3) )
+        }
+        console.log(    groups)
+        return groups
+    })
+
     searchHistory = signal<Record<string,Gif[]>>(loadFromLocalStorage())
     //Para extraer las keys cada vez que el record cambia
     searchHistoryKey = computed(() => Object.keys(this.searchHistory()))
@@ -30,6 +39,7 @@ export class GifsService {
 
     saveGifsToLocalStorage = effect( () =>{
         localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory()) )
+        this.loadTrendingGifs();
     })
 
     loadTrendingGifs(){
@@ -39,7 +49,7 @@ export class GifsService {
             {
                 params:{
                     api_key : environment.giphyApiKey,
-                    limit : '20',
+                    limit : '12',
                 }
             }
         ).subscribe(    
