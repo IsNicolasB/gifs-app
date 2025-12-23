@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal, Signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, Signal, WritableSignal } from '@angular/core';
 import { RouterLinkActive, RouterLink } from "@angular/router";
+import { GifsService } from 'src/app/gifs/services/gifs.service';
 
 interface MenuOption {
   icon : string;
@@ -15,6 +16,9 @@ interface MenuOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SideMenuOptions {
+
+  gifService = inject(GifsService)
+
   menuOptions : WritableSignal<MenuOption[]> = signal([    
     {
       icon : 'fa-solid fa-chart-line',
@@ -29,5 +33,4 @@ export class SideMenuOptions {
       route: '/dashboard/search'
     }
   ])
-
 }
