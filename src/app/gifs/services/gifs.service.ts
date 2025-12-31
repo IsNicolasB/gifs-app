@@ -17,14 +17,14 @@ export class GifsService {
     private http = inject(HttpClient)
 
     trendingGifs = signal<Gif[]>([])
-    trendingGifsLoad = signal<boolean>(true)
- 
+    trendingGifsLoad = signal<boolean>(false)
+    trendingPage = signal<number>(0)
+
     trendingGifGroup = computed<Gif[][]>(()=> {
         const groups : Gif[][] = []
         for( let i = 0; i < this.trendingGifs().length; i += 3){
             groups.push( this.trendingGifs().slice(i, i + 3) )
         }
-        console.log(    groups)
         return groups
     })
 
@@ -35,14 +35,18 @@ export class GifsService {
     constructor(){
         // this.loadTrendingGifs()
         console.log('Servicio Creado')
+        console.log(this.trendingGifs().length.toString())
     }
 
     saveGifsToLocalStorage = effect( () =>{
         localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory()) )
-        this.loadTrendingGifs();
     })
 
     loadTrendingGifs(){
+
+        if(this.trendingGifsLoad()) return; //si ya esta cargando, no hacer nada
+        
+        this.trendingGifsLoad.set(true)
 
         this.http.get<GiphyResponse>(
             `${environment.giphyUrl}/gifs/trending`,
@@ -50,13 +54,16 @@ export class GifsService {
                 params:{
                     api_key : environment.giphyApiKey,
                     limit : '12',
+                    offset : (this.trendingPage() * 12).toString(),
                 }
             }
         ).subscribe(    
             (resp) => {
                 const gifs = GifMapper.mapGiphyItemsToGifsArray(resp.data)
-                this.trendingGifs.set(gifs)
+                this.trendingGifs.update((currentGifs) => [...currentGifs, ...gifs] )
                 this.trendingGifsLoad.set(false)
+                this.trendingPage.update( (current) => current + 1 )
+                console.log('Gifs de tendencia cargados: ' + this.trendingGifs().length.toString())
             }
         )
     }
@@ -85,8 +92,6 @@ export class GifsService {
                 }
             )
         )
-
-
     }
 
     getHistoryGifs(query: string){
